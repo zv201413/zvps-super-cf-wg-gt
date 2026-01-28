@@ -22,48 +22,25 @@ RUN curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/r
 
     && rm cloudflared.deb
 
-
-
 # 3. 极速修复 SSH 权限与目录
-
-RUN mkdir -p /run/sshd && \
-
+RUN mkdir -p /run/sshd /etc/supervisor/conf.d && \
     sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config && \
-
     sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config && \
-
     ssh-keygen -A
 
-
-
-# 4. 用户权限固化：创建 zv 用户、设置密码、赋予免密 sudo
-
+# 4. 用户设置 (保持不变)
 RUN useradd -m -s /bin/bash zv && \
-
     echo "zv:105106" | chpasswd && \
-
     echo "root:105106" | chpasswd && \
-
     echo "zv ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-
-
-# 5. 核心：建立配置文件软链接
-
-# 就算你以后没带 -c 参数启动，supervisorctl 也会默认去硬盘找配置
-
-RUN ln -sf /home/zv/boot/supervisord.conf /etc/supervisord.conf
-
-
+# 5. 【修改点】不要直接用软链接指向硬盘，先在镜像里放一个“保底”配置
+# 这样即使硬盘没挂载成功，SSH 也能起来，方便你进去修
+COPY supervisord.conf /etc/supervisord.conf
 
 # 6. 设置工作目录
-
 WORKDIR /home/zv
 
-
-
-# 7. 启动指令：使用 nodaemon 模式作为容器主进程
-
-# 只要 /home/zv/boot/supervisord.conf 存在，它就会接管一切
-
-CMD ["/usr/bin/supervisord", "-n", "-c", "/home/zv/boot/supervisord.conf"]
+# 7. 【修改点】启动脚本
+# 检查硬盘里有没有配置，有就用硬盘的，没有就用镜像自带的
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf"]
