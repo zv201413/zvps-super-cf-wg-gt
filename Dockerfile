@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
 RUN curl -L --retry 3 --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb && \
     dpkg -i cloudflared.deb && rm cloudflared.deb
 
-# 3. 安装 GOST v2.12.0 (处理 .tar.gz 格式)
+# 1-3. 安装 GOST v2.12.0 (处理 .tar.gz 格式)
 RUN wget --tries=3 https://github.com/ginuerzh/gost/releases/download/v2.12.0/gost_2.12.0_linux_amd64.tar.gz && \
     tar -xvf gost_2.12.0_linux_amd64.tar.gz && \
     mv gost /usr/local/bin/gost && \
