@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
     supervisor procps wget curl passwd sudo openssh-server net-tools && \
     rm -rf /var/lib/apt/lists/*
 
-# 2. 安装 Cloudflared
+# 1-2. 安装 Cloudflared
 RUN curl -L --retry 3 --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb && \
     dpkg -i cloudflared.deb && rm cloudflared.deb
 
