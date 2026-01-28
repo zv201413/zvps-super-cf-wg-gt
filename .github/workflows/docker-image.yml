@@ -25,8 +25,8 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          # 确保这里使用的是自动生成的令牌
-          password: ${{ secrets.GITHUB_TOKEN }}
+          # 注意：这里是通过名字引用 Secret，而不是直接写字符串
+          password: ${{ secrets.MY_PAT }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
